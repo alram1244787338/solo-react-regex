@@ -11,7 +11,7 @@ function PresetList({ onSelect }) {
             key={preset.name}
             type="button"
             className="preset-btn"
-            onClick={() => onSelect(`/${preset.pattern}/${preset.flags}`)}
+            onClick={() => onSelect(preset.pattern, preset.flags)}
           >
             {preset.name}
           </button>

@@ -31,6 +31,10 @@ const PRESETS = [
   },
 ];
 
+function formatRegexInput(pattern, flags) {
+  return `/${pattern}/${flags || ''}`;
+}
+
 function parseRegex(pattern) {
   if (!pattern || !pattern.trim()) {
     return { regex: null, error: null };
@@ -57,54 +61,15 @@ function parseRegex(pattern) {
   }
 }
 
-function getGroups(regex) {
-  if (!regex) return [];
-
-  const groups = [];
-  const source = regex.source;
-  let depth = 0;
-  let inClass = false;
-  let escaped = false;
-  let groupIndex = 0;
-
-  for (let i = 0; i < source.length; i++) {
-    const ch = source[i];
-
-    if (escaped) {
-      escaped = false;
-      continue;
-    }
-
-    if (ch === '\\') {
-      escaped = true;
-      continue;
-    }
-
-    if (ch === '[') {
-      inClass = true;
-      continue;
-    }
-
-    if (ch === ']') {
-      inClass = false;
-      continue;
-    }
-
-    if (inClass) continue;
-
-    if (ch === '(') {
-      const next = source[i + 1];
-      if (next === '?') {
-        if (source[i + 2] === ':' || source[i + 2] === '=' || source[i + 2] === '!' || source[i + 2] === '<') {
-          continue;
-        }
-      }
-      groupIndex++;
-      groups.push(groupIndex);
-    }
+function getGroupCount(regex) {
+  if (!regex) return 0;
+  try {
+    const testRe = new RegExp(regex.source + '|');
+    const match = testRe.exec('');
+    return match ? match.length - 1 : 0;
+  } catch (e) {
+    return 0;
   }
-
-  return groups;
 }
 
 function matchAll(regex, text) {
@@ -112,10 +77,10 @@ function matchAll(regex, text) {
 
   const results = [];
   const hasGlobal = regex.flags.includes('g');
+  const re = new RegExp(regex.source, regex.flags);
 
   if (hasGlobal) {
     let match;
-    const re = new RegExp(regex.source, regex.flags);
     while ((match = re.exec(text)) !== null) {
       results.push({
         match: match[0],
@@ -127,7 +92,7 @@ function matchAll(regex, text) {
       }
     }
   } else {
-    const match = regex.exec(text);
+    const match = re.exec(text);
     if (match) {
       results.push({
         match: match[0],
@@ -176,8 +141,9 @@ function highlightMatches(text, matches) {
 
 export {
   PRESETS,
+  formatRegexInput,
   parseRegex,
-  getGroups,
+  getGroupCount,
   matchAll,
   highlightMatches,
 };

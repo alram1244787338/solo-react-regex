@@ -233,6 +233,11 @@ code {
   font-style: italic;
 }
 
+.highlight-text span,
+.highlight-text mark {
+  white-space: pre-wrap;
+}
+
 .match-mark {
   background-color: #ffe58f;
   padding: 1px 2px;

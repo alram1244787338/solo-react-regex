@@ -3,7 +3,7 @@ import RegexInput from './RegexInput.jsx';
 import TestInput from './TestInput.jsx';
 import MatchResult from './MatchResult.jsx';
 import PresetList from './PresetList.jsx';
-import { parseRegex, matchAll } from '../utils/regex.js';
+import { parseRegex, matchAll, formatRegexInput } from '../utils/regex.js';
 
 function Layout() {
   const [pattern, setPattern] = useState('');
@@ -12,8 +12,8 @@ function Layout() {
   const { regex, error } = useMemo(() => parseRegex(pattern), [pattern]);
   const matches = useMemo(() => matchAll(regex, testText), [regex, testText]);
 
-  const handlePresetSelect = (presetPattern) => {
-    setPattern(presetPattern);
+  const handlePresetSelect = (presetPattern, presetFlags) => {
+    setPattern(formatRegexInput(presetPattern, presetFlags));
   };
 
   return (
